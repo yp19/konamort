@@ -4,8 +4,8 @@ import json
 @click.command()
 @click.option("--input_file", required=True, type=click.File("rb"), nargs=1)
 @click.option("--fields_to_track", type=click.STRING, multiple=True)
-def cli(fields_to_track, input_file):
-    print(fields_to_track)
+@click.option("--fields_to_exclude", type=click.STRING, multiple=True)
+def cli(input_file, fields_to_track, fields_to_exclude):
     data = json.load(input_file)
     res = []
     for state_data in data["mortgageRateList"]:
@@ -17,6 +17,11 @@ def cli(fields_to_track, input_file):
                     fields.append(k)
             else:
                 fields = fields_to_track
+
+            # Removes fields from the track
+            for f in fields_to_exclude:
+                fields.remove(f)
+
             fields_empty = check_fields_empty(fields, state_data[state_name])
 
         if fields_empty:
